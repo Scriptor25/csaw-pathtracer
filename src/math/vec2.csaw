@@ -1,0 +1,46 @@
+\inc "math/vec2.csh"
+\inc "std/math.csh"
+
+@Vec2 = *me = Vec2(0, 0);
+@Vec2(t: Float) = *me = Vec2(t, t);
+@Vec2(x: Float, y: Float) {
+    me!e[0] = x;
+    me!e[1] = y;
+}
+
+@x:Vec2:Float = me!e[0];
+@y:Vec2:Float = me!e[1];
+
+@"-":Vec2:Vec2 = Vec2(-me!x(), -me!y());
+@"[]":Vec2(i: Int): Float* = &me!e[i];
+
+@"+=":Vec2(v: Vec2): Vec2 {
+    me!e[0] += v.x();
+    me!e[1] += v.y();
+    ret *me;
+}
+
+@"-=":Vec2(v: Vec2): Vec2 {
+    me!e[0] -= v.x();
+    me!e[1] -= v.y();
+    ret *me;
+}
+
+@"*=":Vec2(t: Float): Vec2 {
+    me!e[0] *= t;
+    me!e[1] *= t;
+    ret *me;
+}
+
+@"/=":Vec2(t: Float): Vec2 = *me *= (1 / t);
+
+@"+"(u: Vec2, v: Vec2): Vec2 = Vec2(u.x() + v.x(), u.y() + v.y());
+@"-"(u: Vec2, v: Vec2): Vec2 = Vec2(u.x() - v.x(), u.y() - v.y());
+@"*"(v: Vec2, t: Float): Vec2 = Vec2(v.x() * t, v.y() * t);
+@"*"(t: Float, v: Vec2): Vec2 = v * t;
+@"/"(v: Vec2, t: Float): Vec2 = v * (1 / t);
+
+@length(v: Vec2): Float = sqrt(dot(v, v));
+@normalize(v: Vec2): Vec2 = v / length(v);
+@dot(u: Vec2, v: Vec2): Float = u.x() * v.x() + u.y() * v.y();
+@dist(u: Vec2, v: Vec2): Float = length(u - v);

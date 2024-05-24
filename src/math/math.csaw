@@ -1,0 +1,24 @@
+\inc "math/math.csh"
+\inc "math/point2.csh"
+\inc "math/vec2.csh"
+\inc "std/math.csh"
+
+@radians(theta: Float): Float = theta * PI / 180.0;
+
+@concentric_sample_disk(u: Point2): Point2 {
+    offset: Point2 = 2 * u - Vec2(1, 1);
+    if (offset.x() == 0 && offset.y() == 0)
+        ret Point2(0, 0);
+    
+    r: Float;
+    theta: Float;
+    if (abs(offset.x()) > abs(offset.y())) {
+        r = offset.x();
+        theta = PI / 4 * (offset.y() / offset.x());
+    } else {
+        r = offset.y();
+        theta = PI / 2 - PI / 4 * (offset.x() / offset.y());
+    }
+
+    ret r * Point2(cos(theta), sin(theta));
+}

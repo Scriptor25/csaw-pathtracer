@@ -1,0 +1,239 @@
+\inc "math/mat4.csh"
+\inc "math/point3.csh"
+\inc "math/vec3.csh"
+\inc "std/math.csh"
+\inc "std/stdio.csh"
+
+@Mat4 {
+    me!m[0][0] = 1.0;
+    me!m[1][1] = 1.0;
+    me!m[2][2] = 1.0;
+    me!m[3][3] = 1.0;
+}
+
+@"[]":Mat4(i: Int): Vec4* = &me!m[i];
+
+@"+"(m1: Mat4, m2: Mat4): Mat4 {
+    res: Mat4;
+    for (r: Int; r < 4; ++r)
+        for (c: Int; c < 4; ++c)
+            res[r][c] = m1[r][c] + m2[r][c];
+    ret res;
+}
+
+@"-"(m1: Mat4, m2: Mat4): Mat4 {
+    res: Mat4;
+    for (r: Int; r < 4; ++r)
+        for (c: Int; c < 4; ++c)
+            res[r][c] = m1[r][c] - m2[r][c];
+    ret res;
+}
+
+@"*"(m1: Mat4, m2: Mat4): Mat4 {
+    res: Mat4;
+    for (r: Int; r < 4; ++r)
+        for (c: Int; c < 4; ++c)
+            res[r][c] = m1[r][0] * m2[0][c] + m1[r][1] * m2[1][c] + m1[r][2] * m2[2][c] + m1[r][3] * m2[3][c];
+    ret res;
+}
+
+@"*"(m: Mat4, t: Float): Mat4 {
+    res: Mat4;
+    for (r: Int; r < 4; ++r)
+        for (c: Int; c < 4; ++c)
+            res[r][c] = m[r][c] * t;
+    ret res;
+}
+
+@transpose(m: Mat4): Mat4 {
+    res: Mat4;
+    for (r: Int; r < 4; ++r)
+        for (c: Int; c < 4; ++c)
+            res[r][c] = m[c][r];
+    ret res;
+}
+
+@inverse(m: Mat4): Mat4 {
+
+    A2323: Float = m[2][2] * m[3][3] - m[2][3] * m[3][2];
+    A1323: Float = m[2][1] * m[3][3] - m[2][3] * m[3][1];
+    A1223: Float = m[2][1] * m[3][2] - m[2][2] * m[3][1];
+    A0323: Float = m[2][0] * m[3][3] - m[2][3] * m[3][0];
+    A0223: Float = m[2][0] * m[3][2] - m[2][2] * m[3][0];
+    A0123: Float = m[2][0] * m[3][1] - m[2][1] * m[3][0];
+    A2313: Float = m[1][2] * m[3][3] - m[1][3] * m[3][2];
+    A1313: Float = m[1][1] * m[3][3] - m[1][3] * m[3][1];
+    A1213: Float = m[1][1] * m[3][2] - m[1][2] * m[3][1];
+    A2312: Float = m[1][2] * m[2][3] - m[1][3] * m[2][2];
+    A1312: Float = m[1][1] * m[2][3] - m[1][3] * m[2][1];
+    A1212: Float = m[1][1] * m[2][2] - m[1][2] * m[2][1];
+    A0313: Float = m[1][0] * m[3][3] - m[1][3] * m[3][0];
+    A0213: Float = m[1][0] * m[3][2] - m[1][2] * m[3][0];
+    A0312: Float = m[1][0] * m[2][3] - m[1][3] * m[2][0];
+    A0212: Float = m[1][0] * m[2][2] - m[1][2] * m[2][0];
+    A0113: Float = m[1][0] * m[3][1] - m[1][1] * m[3][0];
+    A0112: Float = m[1][0] * m[2][1] - m[1][1] * m[2][0];
+
+    det: Float = m[0][0] * (m[1][1] * A2323 - m[1][2] * A1323 + m[1][3] * A1223) 
+               - m[0][1] * (m[1][0] * A2323 - m[1][2] * A0323 + m[1][3] * A0223)    
+               + m[0][2] * (m[1][0] * A1323 - m[1][1] * A0323 + m[1][3] * A0123)    
+               - m[0][3] * (m[1][0] * A1223 - m[1][1] * A0223 + m[1][2] * A0123);   
+    det = 1 / det;
+
+    res: Mat4;
+
+    res[0][0] = det *  (m[1][1] * A2323 - m[1][2] * A1323 + m[1][3] * A1223);
+    res[0][1] = det * -(m[0][1] * A2323 - m[0][2] * A1323 + m[0][3] * A1223);
+    res[0][2] = det *  (m[0][1] * A2313 - m[0][2] * A1313 + m[0][3] * A1213);
+    res[0][3] = det * -(m[0][1] * A2312 - m[0][2] * A1312 + m[0][3] * A1212);
+    res[1][0] = det * -(m[1][0] * A2323 - m[1][2] * A0323 + m[1][3] * A0223);
+    res[1][1] = det *  (m[0][0] * A2323 - m[0][2] * A0323 + m[0][3] * A0223);
+    res[1][2] = det * -(m[0][0] * A2313 - m[0][2] * A0313 + m[0][3] * A0213);
+    res[1][3] = det *  (m[0][0] * A2312 - m[0][2] * A0312 + m[0][3] * A0212);
+    res[2][0] = det *  (m[1][0] * A1323 - m[1][1] * A0323 + m[1][3] * A0123);
+    res[2][1] = det * -(m[0][0] * A1323 - m[0][1] * A0323 + m[0][3] * A0123);
+    res[2][2] = det *  (m[0][0] * A1313 - m[0][1] * A0313 + m[0][3] * A0113);
+    res[2][3] = det * -(m[0][0] * A1312 - m[0][1] * A0312 + m[0][3] * A0112);
+    res[3][0] = det * -(m[1][0] * A1223 - m[1][1] * A0223 + m[1][2] * A0123);
+    res[3][1] = det *  (m[0][0] * A1223 - m[0][1] * A0223 + m[0][2] * A0123);
+    res[3][2] = det * -(m[0][0] * A1213 - m[0][1] * A0213 + m[0][2] * A0113);
+    res[3][3] = det *  (m[0][0] * A1212 - m[0][1] * A0212 + m[0][2] * A0112);
+
+    ret res;
+}
+
+@print(m: Mat4): void {
+    for (r: Int; r < 4; ++r) {
+        for (c: Int; c < 4; ++c)
+            printf("[%f]", m[r][c]);
+        printf("\n");
+    }
+}
+
+@translate(offset: Vec3): Mat4 {
+    mat: Mat4;
+    mat[0][3] = offset.x();
+    mat[1][3] = offset.y();
+    mat[2][3] = offset.z();
+    mat[3][3] = 1.0;
+    ret mat;
+}
+
+@rotate_x(theta: Float): Mat4 {
+
+    sin: Float = sin(radians(theta));
+    cos: Float = cos(radians(theta));
+
+    mat: Mat4;
+    mat[0][0] =  1.0;
+    mat[1][1] =  cos;
+    mat[1][2] = -sin;
+    mat[2][1] =  sin;
+    mat[2][2] =  cos;
+    mat[3][3] =  1.0;
+    ret mat;
+}
+
+@rotate_y(theta: Float): Mat4 {
+
+    sin: Float = sin(radians(theta));
+    cos: Float = cos(radians(theta));
+
+    mat: Mat4;
+    mat[0][0] =  cos;
+    mat[0][2] =  sin;
+    mat[1][1] =  1.0;
+    mat[2][0] = -sin;
+    mat[2][2] =  cos;
+    mat[3][3] =  1.0;
+    ret mat;
+}
+
+@rotate_z(theta: Float): Mat4 {
+
+    sin: Float = sin(radians(theta));
+    cos: Float = cos(radians(theta));
+
+    mat: Mat4;
+    mat[0][0] =  cos;
+    mat[0][1] = -sin;
+    mat[1][0] =  sin;
+    mat[1][1] =  cos;
+    mat[2][2] =  1.0;
+    mat[3][3] =  1.0;
+    ret mat;
+}
+
+@rotate(theta: Float, axis: Vec3): Mat4 {
+
+    a: Vec3 = normalize(axis);
+    sin: Float = sin(radians(theta));
+    cos: Float = cos(radians(theta));
+
+    mat: Mat4;
+    
+    mat[0][0] = a.x() * a.x() + (1 - a.x() * a.x()) * cos;
+    mat[0][1] = a.x() * a.y() * (1 - cos) - a.z() * sin;
+    mat[0][2] = a.x() * a.z() * (1 - cos) + a.y() * sin;
+    mat[0][3] = 0.0;
+
+    mat[1][0] = a.y() * a.x() * (1 - cos) + a.z() * sin;
+    mat[1][1] = a.y() * a.y() + (1 - a.y() * a.y()) * cos;
+    mat[1][2] = a.y() * a.z() * (1 - cos) + a.x() * sin;
+    mat[1][3] = 0.0;
+
+    mat[2][0] = a.z() * a.x() * (1 - cos) - a.y() * sin;
+    mat[2][1] = a.z() * a.y() * (1 - cos) + a.x() * sin;
+    mat[2][2] = a.z() * a.z() + (1 - a.z() * a.z()) * cos;
+    mat[2][3] = 0.0;
+
+    ret mat;
+}
+
+@scale(scale: Vec3): Mat4 {
+    mat: Mat4;
+    mat[0][0] = scale.x();
+    mat[1][1] = scale.y();
+    mat[2][2] = scale.z();
+    mat[3][3] = 1.0;
+    ret mat;
+}
+
+@look_at(eye: Point3, target: Point3, up: Vec3): Mat4 {
+
+    dir: Vec3 = normalize(target - eye);
+    left: Vec3 = normalize(cross(normalize(up), dir));
+    new_up: Vec3 = cross(dir, left);
+
+    mat: Mat4;
+    mat[0][0] = left.x();
+    mat[1][0] = left.y();
+    mat[2][0] = left.z();
+    mat[3][0] = 0.0;
+    mat[0][1] = new_up.x();
+    mat[1][1] = new_up.y();
+    mat[2][1] = new_up.z();
+    mat[3][1] = 0.0;
+    mat[0][2] = dir.x();
+    mat[1][2] = dir.y();
+    mat[2][2] = dir.z();
+    mat[3][2] = 0.0;
+    mat[0][3] = eye.x();
+    mat[1][3] = eye.y();
+    mat[2][3] = eye.z();
+    mat[3][3] = 1.0;
+    ret mat;
+}
+
+@perspective(fov: Float, aspect: Float, near: Float, far: Float): Mat4 {
+    s: Float = 1 / tan(radians(fov / 2));
+
+    mat: Mat4;
+    mat[0][0] = aspect * s;
+    mat[1][1] = s;
+    mat[2][2] = far / (far - near);
+    mat[2][3] = -(far * near) / (far - near);
+    mat[3][2] = 1.0;
+    mat[3][3] = 0.0;
+    ret mat;
+}

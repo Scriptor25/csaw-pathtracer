@@ -1,0 +1,25 @@
+\inc "image.csh"
+\inc "std/stdio.csh"
+\inc "std/stdlib.csh"
+
+@Image(width: int64, height: int64) {
+    me!width = width;
+    me!height = height;
+    me!buffer = malloc($(int32) * width * height);
+}
+
+@set:Image(x: int64, y: int64, color: int32): void = me!buffer[x + y * me!width] = color;
+
+@write:Image(filename: int8*): void {
+    stream: FILE* = fopen(filename, "wb");
+
+    fprintf(stream, "P6\n%d %d\n255\n", me!width, me!height);
+    for (i: int64; i < me!width * me!height; ++i) {
+        c: int32 = me!buffer[i];
+        fprintf(stream, "%c%c%c", (c >> 16) & 0xff, (c >> 8) & 0xff, c & 0xff);
+    }
+
+    fclose(stream);
+}
+
+@free:Image:void = free(me!buffer);

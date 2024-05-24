@@ -1,0 +1,110 @@
+\inc "string.csh"
+\inc "std/stdlib.csh"
+\inc "std/string.csh"
+
+@String {
+    me!size = 0;
+    me!reserved = 10;
+    me!buffer = malloc($(int8) * me!reserved);
+    me!buffer[0] = 0;
+}
+
+@String(c: int8, size: int64) {
+    me!size = size;
+    me!reserved = (size >= 10) ? (size + 1) : 10;
+    me!buffer = malloc($(int8) * me!reserved);
+    memset(me!buffer, c, size);
+    me!buffer[me!size] = 0;
+}
+
+@String(str: int8*) {
+    len: int64 = strlen(str);
+    me!size = len;
+    me!reserved = (len >= 10) ? (len + 1) : 10;
+    me!buffer = malloc($(int8) * me!reserved);
+    strcpy(me!buffer, str);
+    me!buffer[me!size] = 0;
+}
+
+@String(str: String) {
+    me!size = str.size;
+    me!reserved = str.reserved;
+    me!buffer = malloc($(int8) * me!reserved);
+    strcpy(me!buffer, str.buffer);
+    me!buffer[me!size] = 0;
+}
+
+@cstr:String:int8* = me!buffer;
+
+@length:String:int64 = me!size;
+
+@"!":String:int1 = me!size == 0;
+
+@"[]":String(i: int64): int8* = &me!buffer[i];
+
+@"+=":String(c: int8): String {
+    if (me!size == me!reserved) {
+        me!reserved *= 2;
+        me!buffer = realloc(me!buffer, $(int8) * me!reserved);
+    }
+    me!buffer[me!size] = c;
+    me!buffer[++me!size] = 0;
+    ret *me;
+}
+
+@"+=":String(str: int8*): String {
+    len: int64 = strlen(str);
+    me!size += len;
+    while (me!size >= me!reserved) {
+        me!reserved *= 2;
+        me!buffer = realloc(me!buffer, $(int8) * me!reserved);
+    }
+    strcat(me!buffer, str);
+    me!buffer[me!size] = 0;
+    ret *me;
+}
+
+@"+=":String(str: String): String {
+    me!size += str.size;
+    while (me!size >= me!reserved) {
+        me!reserved *= 2;
+        me!buffer = realloc(me!buffer, $(int8) * me!reserved);
+    }
+    strcat(me!buffer, str.buffer);
+    me!buffer[me!size] = 0;
+    ret *me;
+}
+
+@"=":String(c: int8): String {
+    me!size = 0;
+    me!buffer[me!size] = c;
+    me!buffer[++me!size] = 0;
+    ret *me;
+}
+
+@"=":String(str: int8*): String {
+    len: int64 = strlen(str);
+    me!size = len;
+    while (me!size >= me!reserved) {
+        me!reserved *= 2;
+        me!buffer = realloc(me!buffer, $(int8) * me!reserved);
+    }
+    me!buffer[0] = 0;
+    strcpy(me!buffer, str);
+    me!buffer[me!size] = 0;
+    ret *me;
+}
+
+@"=":String(str: String): String {
+    me!size = str.size;
+    while (me!size >= me!reserved) {
+        me!reserved *= 2;
+        me!buffer = realloc(me!buffer, $(int8) * me!reserved);
+    }
+    me!buffer[0] = 0;
+    strcpy(me!buffer, str.buffer);
+    me!buffer[me!size] = 0;
+    ret *me;
+}
+
+@free:String:void = free(me!buffer);

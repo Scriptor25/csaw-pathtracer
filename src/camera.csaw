@@ -1,0 +1,28 @@
+\inc "camera.csh"
+\inc "math/point2.csh"
+\inc "math/ray.csh"
+\inc "math/vec3.csh"
+
+@Camera(eye: Point3, target: Point3, up: Vec3, fov: Float, aspect: Float, near: Float, far: Float, lensr: Float, focald: Float) {
+    me!position = eye;
+    me!view = look_at(eye, target, up);
+    me!inv_view = inverse(me!view);
+    me!proj = perspective(fov, aspect, near, far);
+    me!inv_proj = inverse(me!proj);
+    me!lens_radius = lensr;
+    me!focal_distance = focald;
+}
+
+@get_ray:Camera(u: Float, v: Float, ray: Ray*): void {
+    film: Point3 = Point3(u, v, 0);
+    camera: Point3 = Point3(u * 2 - 1, v * 2 - 1, 1);
+    *ray = Ray(Point3(), normalize(Vec3(camera)));
+    if (me!lens_radius > 0) {
+        lens: Point2 = me!lens_radius * concentric_sample_disk(Point2(u, v));
+        ft: Float = me!focal_distance / ray!direction().z();
+        focus: Point3 = ray!at(ft);
+        ray!orig = Point3(lens.x(), lens.y(), 0);
+        ray!dir = normalize(focus - ray!origin());
+    }
+    *ray = *ray * me!view;
+}

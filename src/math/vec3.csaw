@@ -1,0 +1,71 @@
+\inc "math/mat4.csh"
+\inc "math/point3.csh"
+\inc "math/vec3.csh"
+\inc "std/math.csh"
+
+@Vec3 = *me = Vec3(0.0, 0.0, 0.0);
+
+@Vec3(t: Float) = *me = Vec3(t, t, t);
+
+@Vec3(p: Point3) = *me = Vec3(p.x(), p.y(), p.z());
+
+@Vec3(x: Float, y: Float, z: Float) {
+    me!e[0] = x;
+    me!e[1] = y;
+    me!e[2] = z;
+}
+
+@x:Vec3:Float = me!e[0];
+@y:Vec3:Float = me!e[1];
+@z:Vec3:Float = me!e[2];
+
+@"-":Vec3:Vec3 = Vec3(-me!x(), -me!y(), -me!z());
+
+@"[]":Vec3(i: Int): Float* = &me!e[i];
+
+@"+=":Vec3(v: Vec3): Vec3 {
+    me!e[0] += v.x();
+    me!e[1] += v.y();
+    me!e[2] += v.z();
+    ret *me;
+}
+
+@"-=":Vec3(v: Vec3): Vec3 {
+    me!e[0] -= v.x();
+    me!e[1] -= v.y();
+    me!e[2] -= v.z();
+    ret *me;
+}
+
+@"*=":Vec3(t: Float): Vec3 {
+    me!e[0] *= t;
+    me!e[1] *= t;
+    me!e[2] *= t;
+    ret *me;
+}
+
+@"/=":Vec3(t: Float): Vec3 = *me *= (1 / t);
+
+@"+"(u: Vec3, v: Vec3): Vec3 = Vec3(u.x() + v.x(), u.y() + v.y(), u.z() + v.z());
+@"-"(u: Vec3, v: Vec3): Vec3 = Vec3(u.x() - v.x(), u.y() - v.y(), u.z() - v.z());
+@"*"(v: Vec3, t: Float): Vec3 = Vec3(v.x() * t, v.y() * t, v.z() * t);
+@"*"(t: Float, v: Vec3): Vec3 = v * t;
+@"/"(v: Vec3, t: Float): Vec3 = v * (1 / t);
+
+@"*"(v: Vec3, m: Mat4): Vec3 {
+    x: Float = v.x(); y: Float = v.y(); z: Float = v.z();
+    xp: Float = m[0][0] * x + m[0][1] * y + m[0][2] * z;
+    yp: Float = m[1][0] * x + m[1][1] * y + m[1][2] * z;
+    zp: Float = m[2][0] * x + m[2][1] * y + m[2][2] * z;
+    ret Vec3(xp, yp, zp);
+}
+
+@length(v: Vec3): Float = sqrt(dot(v, v));
+@normalize(v: Vec3): Vec3 = v / length(v);
+@dot(u: Vec3, v: Vec3): Float = u.x() * v.x() + u.y() * v.y() + u.z() * v.z();
+@cross(u: Vec3, v: Vec3): Vec3 = Vec3(
+    u.y() * v.z() - u.z() * v.y(),
+    u.z() * v.x() - u.x() * v.z(),
+    u.x() * v.y() - u.y() * v.x()
+);
+@dist(u: Vec3, v: Vec3): Float = length(u - v);

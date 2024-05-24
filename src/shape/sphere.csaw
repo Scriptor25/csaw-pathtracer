@@ -1,0 +1,39 @@
+\inc "math/ray.csh"
+\inc "shape/sphere.csh"
+\inc "std/math.csh"
+
+@Sphere(center: Point3, radius: Float) {
+    me!cen = center;
+    me!rad = radius;
+}
+
+@center:Sphere:Point3 = me!cen;
+@radius:Sphere:Float  = me!rad;
+
+@intersect:Sphere(ray: Ray, t: Interval, payload: Payload*): bool {
+
+    oc: Vec3 = me!center() - ray.origin();
+    a: Float = dot(ray.direction(), ray.direction());
+    b: Float = dot(oc, ray.direction());
+    c: Float = dot(oc, oc) - me!radius() * me!radius();
+    d: Float = b * b - a * c;
+
+    if (d < 0)
+        ret false;
+    
+    sqrtd: Float = sqrt(d);
+    inva: Float  = 1 / a;
+
+    root: Float = (-b - sqrtd) * inva;
+    if (!t.contains(root)) {
+        root = (-b + sqrtd) * inva;
+        if (!t.contains(root))
+            ret false;
+    }
+
+    payload!t = root;
+    payload!p = ray.at(root);
+    payload!normal = (me!center() - payload!p) / me!radius();
+
+    ret true;
+}

@@ -1,0 +1,3 @@
+\inc "interval.csh"
+
+@contains:Interval(x: Float): bool = me!min < x && x < me!max;

@@ -1,0 +1,17 @@
+\inc "math/point2.csh"
+\inc "math/vec2.csh"
+
+@Point2 = *me = Point2(0, 0);
+
+@Point2(x: Float, y: Float) {
+    me!e[0] = x;
+    me!e[1] = y;
+}
+
+@x:Point2:Float = me!e[0];
+@y:Point2:Float = me!e[1];
+
+@"+"(p: Point2, v: Vec2): Point2 = Point2(p.x() + v.x(), p.y() + v.y());
+@"-"(p: Point2, v: Vec2): Point2 = Point2(p.x() - v.x(), p.y() - v.y());
+@"*"(p: Point2, t: Float): Point2 = Point2(p.x() * t, p.y() * t);
+@"*"(t: Float, p: Point2): Point2 = p * t;

@@ -1,0 +1,22 @@
+\inc "color.csh"
+\inc "image.csh"
+
+@[c]main(argc: int32, argv: int8**): int32 {
+
+    image: Image = Image(100, 100);
+
+    for (j: Int; j < image.height; ++j)
+        for (i: Int; i < image.width; ++i) {
+            u: Float = i / [Float](image.width  - 1);
+            v: Float = j / [Float](image.height - 1);
+
+            color: Color = Color(u, v, 0.2);
+
+            image.set(i, j, toint(color));
+        }
+
+    image.write("out.ppm");
+    image.free();
+
+    ret 0;
+}

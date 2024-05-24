@@ -1,0 +1,14 @@
+\inc "math/ray.csh"
+\inc "math/mat4.csh"
+
+@Ray(origin: Point3, direction: Vec3) {
+    me!orig = origin;
+    me!dir = direction;
+}
+
+@origin:Ray:Point3 = me!orig;
+@direction:Ray:Vec3 = me!dir;
+
+@at:Ray(t: Float): Point3 = me!orig + t * me!dir;
+
+@"*"(r: Ray, m: Mat4): Ray = Ray(r.orig * m, r.dir * m);

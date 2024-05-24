@@ -1,0 +1,10 @@
+\inc "math/normal3.csh"
+\inc "math/vec3.csh"
+
+@Normal3(x: Float, y: Float, z: Float) {
+    me!e[0] = x;
+    me!e[1] = y;
+    me!e[2] = z;
+}
+
+@"=":Normal3(v: Vec3): Normal3 = *me = Normal3(v.x(), v.y(), v.z());

@@ -1,0 +1,39 @@
+\inc "math/mat4.csh"
+\inc "math/point3.csh"
+\inc "math/vec3.csh"
+
+@Point3 = *me = Point3(0.0, 0.0, 0.0);
+
+@Point3(t: Float) = *me = Point3(t, t, t);
+
+@Point3(x: Float, y: Float, z: Float) {
+    me!e[0] = x;
+    me!e[1] = y;
+    me!e[2] = z;
+}
+
+@x:Point3:Float = me!e[0];
+@y:Point3:Float = me!e[1];
+@z:Point3:Float = me!e[2];
+
+@"+"(p: Point3, v: Vec3): Point3 = Point3(p.x() + v.x(), p.y() + v.y(), p.z() + v.z());
+
+@"+"(v: Vec3, p: Point3): Point3 = p + v;
+
+@"-"(p: Point3, v: Vec3): Point3 = Point3(p.x() - v.x(), p.y() - v.y(), p.z() - v.z());
+
+@"-"(u: Point3, v: Point3): Vec3 = Vec3(u.x() - v.x(), u.y() - v.y(), u.z() - v.z());
+
+@"*"(p: Point3, t: Float): Point3 = Point3(p.x() * t, p.y() * t, p.z() * t);
+
+@"/"(p: Point3, t: Float): Point3 = p * (1 / t);
+
+@"*"(p: Point3, m: Mat4): Point3 {
+    x: Float = p.x(); y: Float = p.y(); z: Float = p.z();
+    xp: Float = m[0][0] * x + m[0][1] * y + m[0][2] * z + m[0][3];
+    yp: Float = m[1][0] * x + m[1][1] * y + m[1][2] * z + m[1][3];
+    zp: Float = m[2][0] * x + m[2][1] * y + m[2][2] * z + m[2][3];
+    wp: Float = m[3][0] * x + m[3][1] * y + m[3][2] * z + m[3][3];
+    if (wp == 1) ret Point3(xp, yp, zp);
+    else ret Point3(xp, yp, zp) / wp;
+}

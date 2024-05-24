@@ -1,0 +1,35 @@
+\inc "color.csh"
+\inc "std/math.csh"
+
+@Color(r: Float, g: Float, b: Float) {
+    me!e[0] = r;
+    me!e[1] = g;
+    me!e[2] = b;
+}
+
+@r:Color:Float = me!e[0];
+@g:Color:Float = me!e[1];
+@b:Color:Float = me!e[2];
+
+@"+"(c1: Color, c2: Color): Color = Color(c1.r() + c2.r(), c1.g() + c2.g(), c1.b() + c2.b());
+
+@"*"(c: Color, t: Float): Color = Color(c.r() * t, c.g() * t, c.b() * t);
+
+@"*"(t: Float, c: Color): Color = c * t;
+
+@gamma(c: Float): Float = (c <= 0.0) ? 0.0 : sqrt(c);
+
+GAMMA: int1 = 0;
+
+@toint(color: Color): Int {
+
+    r: Float = GAMMA ? gamma(color.r()) : color.r();
+    g: Float = GAMMA ? gamma(color.g()) : color.g();
+    b: Float = GAMMA ? gamma(color.b()) : color.b();
+
+    ir: Int = [Int](r * 255);
+    ig: Int = [Int](g * 255);
+    ib: Int = [Int](b * 255);
+
+    ret ((ir & 0xff) << 16) | ((ig & 0xff) << 8) | (ib & 0xff);
+}
